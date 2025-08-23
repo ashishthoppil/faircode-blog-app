@@ -4,12 +4,15 @@ import Logo from '../../Layout/Header/Logo'
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { toast } from 'react-toastify'
+import { useRouter } from 'next/router'
 
 const Signin = ({ setIsSignInOpen, setIsSignUpOpen }) => {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [err, setErr] = useState('')
+
+  const router = useRouter();
 
   const onLogin = async (e) => {
     try {
@@ -30,6 +33,7 @@ const Signin = ({ setIsSignInOpen, setIsSignUpOpen }) => {
       } else {
         setIsSignInOpen(false);
         toast.success('You have logged in!')
+        router.push('/dashboard');
       }
     } catch (e) {
       console.error(e)

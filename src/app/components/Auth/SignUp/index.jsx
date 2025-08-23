@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Logo from '../../Layout/Header/Logo'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
+import { useRouter } from 'next/router'
 
 const SignUp = ({ setIsSignUpOpen, setIsSignInOpen }) => {  
 
@@ -11,6 +12,8 @@ const SignUp = ({ setIsSignUpOpen, setIsSignInOpen }) => {
   const [password, setPassword] = useState('');
   const [err, setErr] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   async function onRegister(e) {
     try {
@@ -36,7 +39,7 @@ const SignUp = ({ setIsSignUpOpen, setIsSignInOpen }) => {
         const result = await (await import('next-auth/react')).signIn('credentials', {
           email,
           password,
-          redirect: false,
+          redirect: '/dashboard',
         });
 
         if (result?.error) {
@@ -48,6 +51,7 @@ const SignUp = ({ setIsSignUpOpen, setIsSignInOpen }) => {
         toast('Successfully Registered!', {
           progressClassName: 'bg-orange-500'
         })
+        router.push('/dashboard');
       }
     } catch (e) {
       console.error(e);
