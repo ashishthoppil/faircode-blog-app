@@ -1,11 +1,11 @@
 'use client'
 
-import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import Logo from './Logo'
 import Signin from '../../Auth/SignIn'
 import SignUp from '../../Auth/SignUp'
 import { Icon } from '@iconify/react/dist/iconify.js'
+import { useSession, signOut } from 'next-auth/react'
 
 const Header = () => {
 
@@ -18,7 +18,7 @@ const Header = () => {
   const signUpRef = useRef(null)
   const mobileMenuRef = useRef(null)
 
-  const [user, setUser] = useState();
+  const { data: session, status } = useSession();
 
 
   const handleScroll = () => {
@@ -73,13 +73,13 @@ const Header = () => {
         <div className='container flex items-center justify-between'>
           <Logo />
           <div className='flex items-center gap-2 lg:gap-3'>
-            {!user ? <button
+            {!session ? <button
               className='hidden lg:block  duration-300 bg-primary/15 text-primary hover:text-white hover:bg-primary font-medium text-md py-2 px-6 rounded-lg hover:cursor-pointer'
               onClick={() => {
                 setIsSignInOpen(true)
               }}>
               Sign In
-            </button> : <span className='hidden lg:block'><span className='text-[22px]'>👋</span> Hey {user.user_metadata.full_name.split(' ')[0]}</span>}
+            </button> : <span className='hidden lg:block'><span className='text-[22px]'>👋</span> Hey {session.user.name.split(' ')[0]}</span>}
             {isSignInOpen && (
               <div className='fixed top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center z-50'>
                 <div
@@ -100,7 +100,7 @@ const Header = () => {
                 </div>
               </div>
             )}
-            {!user ? <button
+            {!session ? <button
               className='hidden lg:block bg-primary duration-300 text-white hover:bg-primary/15 hover:text-primary font-medium text-md py-2 px-6 rounded-lg hover:cursor-pointer'
               onClick={() => {
                 setIsSignUpOpen(true)
@@ -109,12 +109,8 @@ const Header = () => {
             </button> : <button
               className='hidden lg:block bg-primary duration-300 text-white hover:bg-primary/15 hover:text-primary font-medium text-md py-2 px-6 rounded-lg hover:cursor-pointer'
               onClick={async () => {
-                let error;
-                // const { error } = await supabase().auth.signOut()
-                if (!error) {
-                  localStorage.removeItem('mpg_email')
-                  window.location.href = '/'
-                }
+                await signOut()
+                window.location.href = '/'
               }}>
               Sign Out
             </button>}
@@ -174,17 +170,14 @@ const Header = () => {
             </button>
           </div>
           <nav className='flex flex-col items-start p-4'>
-            {user ? <span className='text-center'><span className='text-[22px]'>👋</span> Hey {user.user_metadata.full_name.split(' ')[0]}</span> : <></>}
+            {session ? <span className='text-center'><span className='text-[22px]'>👋</span> Hey {session.user.name.split(' ')[0]}</span> : <></>}
             <div className='mt-4 flex flex-col space-y-4 w-full'>
-              {user ? 
+              {session ? 
               <button
                   className='bg-primary text-white px-4 py-2 rounded-lg border  border-primary hover:text-primary hover:bg-transparent hover:cursor-pointer transition duration-300 ease-in-out'
                   onClick={async () => {
-                    let error;
-                    // const { error } = await supabase().auth.signOut()
-                    if (!error) {
-                      window.location.href = '/'
-                    }
+                    await signOut()
+                    window.location.href = '/'
                   }}>
                   Sign Out
                 </button>

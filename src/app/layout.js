@@ -1,5 +1,6 @@
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer'
+import { SessionProvider } from "next-auth/react";
 
 import { Poppins } from "next/font/google";
 
@@ -19,9 +20,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${font.className}`}>
-        <Header />
-        {children}
-        <Footer />
+        <SessionProvider>
+          <Header />
+          {children}
+          <Footer />
+        </SessionProvider>
       </body>
     </html>
   );

@@ -26,7 +26,7 @@ const Hero = () => {
           </div>
 
           <div className='lg:col-span-6 flex flex-col items-center justify-start relative pt-[5rem] pl-0 md:py-4 md:pl-10 h-[35rem]'>
-            <span className='mb-10 text-black'>Check out our top blog posts 👇</span>
+            <span className='text-black'>Check out our top blog posts 👇</span>
             <div className='flex flex-col w-full h-[32rem] overflow-y-auto'>
               
               <BlogItem />

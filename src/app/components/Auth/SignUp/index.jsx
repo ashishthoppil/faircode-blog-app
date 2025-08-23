@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import Logo from '../../Layout/Header/Logo'
 import { useState } from 'react'
+import { toast } from 'react-toastify'
 
 const SignUp = ({ setIsSignUpOpen, setIsSignInOpen }) => {  
 
@@ -10,7 +11,50 @@ const SignUp = ({ setIsSignUpOpen, setIsSignInOpen }) => {
   const [password, setPassword] = useState('');
   const [err, setErr] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState(null);
+
+  async function onRegister(e) {
+    try {
+      e.preventDefault();
+      setErr(null);
+      setLoading(true);
+
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await res.json();
+
+      setLoading(false);
+
+      if (!res.ok) {
+        setErr(data?.error || 'Failed to register');
+      } else {
+        setIsSignUpOpen(false);
+        // Auto login 
+        const result = await (await import('next-auth/react')).signIn('credentials', {
+          email,
+          password,
+          redirect: false,
+        });
+
+        if (result?.error) {
+          toast.error('Something went wrong!', {
+            progressClassName: 'bg-orange-500'
+          })
+          return;
+        }
+        toast('Successfully Registered!', {
+          progressClassName: 'bg-orange-500'
+        })
+      }
+    } catch (e) {
+      console.error(e);
+      setErr('Something went wrong');
+      setLoading(false);
+    }
+  }
 
   return (
     <>
@@ -18,7 +62,7 @@ const SignUp = ({ setIsSignUpOpen, setIsSignInOpen }) => {
         <Logo />
       </div>
 
-      <form>
+      <form onSubmit={onRegister}>
         <div className='mb-[22px]'>
           <input
             value={name} 

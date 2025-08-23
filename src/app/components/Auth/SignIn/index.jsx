@@ -2,12 +2,41 @@
 import Link from 'next/link'
 import Logo from '../../Layout/Header/Logo'
 import { useState } from 'react'
+import { signIn } from 'next-auth/react'
+import { toast } from 'react-toastify'
 
 const Signin = ({ setIsSignInOpen, setIsSignUpOpen }) => {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [err, setErr] = useState('')
+
+  const onLogin = async (e) => {
+    try {
+      e.preventDefault();
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      })
+
+      if (!result || result.error) {
+        const msg =
+          result?.error === 'CredentialsSignin'
+            ? 'Invalid email or password'
+            : result?.error || 'Failed to sign in'
+        setErr(msg)
+        return
+      } else {
+        setIsSignInOpen(false);
+        toast.success('You have logged in!')
+      }
+    } catch (e) {
+      console.error(e)
+      setErr('Something went wrong')
+      setLoading(false)
+    }
+  }
   
   return (
     <>
@@ -15,7 +44,7 @@ const Signin = ({ setIsSignInOpen, setIsSignUpOpen }) => {
         <Logo />
       </div>
 
-      <form>
+      <form onSubmit={onLogin}>
         <div className='mb-[22px]'>
           <input
             value={email}
