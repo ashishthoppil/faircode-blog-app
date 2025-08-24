@@ -3,10 +3,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { BlogItem } from '../BlogItem'
 import { useEffect, useState } from 'react'
+import { Icon } from '@iconify/react'
 
 const Hero = () => {
 
   const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadPosts = async () => {
@@ -16,6 +18,7 @@ const Hero = () => {
       });
       const data = await response.json();
       setBlogs(data);
+      setLoading(false);
     }
     loadPosts();
   }, [])
@@ -44,7 +47,16 @@ const Hero = () => {
           <div className='lg:col-span-6 flex flex-col items-center justify-start relative pt-[5rem] pl-0 md:py-4 md:pl-10 h-[35rem]'>
             <span className='text-black'>Check out our top blog posts 👇</span>
             <div className='flex flex-col w-full h-[32rem] overflow-y-auto'>
-              {blogs.map((blog) => 
+              {loading ? 
+              <div className='flex justify-center items-center h-screen'>
+                <Icon
+                  icon='codex:loader'
+                  width={50}
+                  height={50}
+                  className='text-primary text-24 inline-block me-2'
+                />
+              </div> : 
+              blogs.map((blog) => 
                 <BlogItem 
                   key={blog._id}
                   isDashboard={false}

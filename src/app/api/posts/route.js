@@ -3,25 +3,33 @@ import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { auth } from "@/auth";
 
-export async function GET() {
+export async function GET(req) {
   try {
     const session = await auth();
     const client = await clientPromise;
     const db = client.db(process.env.DB_NAME);
 
-    if (!session?.user?.id) {
-        const posts = await db.collection("posts")
-                    .find({})
-                    .sort({ createdAt: -1 })
-                    .toArray();
+    const { searchParams } = new URL(req.url);
+    const q = (searchParams.get("q") || "").trim();
 
-        return NextResponse.json(posts);
+    const baseFilter =
+      !session?.user?.id || session?.user?.role === "admin"
+        ? {}
+        : { author: new ObjectId(session.user.id) };
+
+    const filter = { ...baseFilter };
+    if (q) {
+      filter.$or = [
+        { title: { $regex: q, $options: "i" } },
+        { authorName: { $regex: q, $options: "i" } },
+      ];
     }
 
-    const posts = await db.collection("posts")
-                    .find({ author: new ObjectId(session.user.id) })
-                    .sort({ createdAt: -1 })
-                    .toArray();
+    const posts = await db
+      .collection("posts")
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .toArray();
 
     return NextResponse.json(posts);
   } catch (err) {

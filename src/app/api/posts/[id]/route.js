@@ -26,7 +26,7 @@ export async function PATCH(req, { params }) {
 
     const post = await posts.findOne({ _id: new ObjectId(postId) });
     if (!post) return NextResponse.json({ error: "Post not found" }, { status: 404 });
-    if (post.author.toString() !== session.user.id) {
+    if (post.author.toString() !== session.user.id && session.user.role !== 'admin') {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -67,7 +67,7 @@ export async function DELETE(req, { params }) {
 
     const post = await posts.findOne({ _id: new ObjectId(postId) });
     if (!post) return NextResponse.json({ error: "Post not found" }, { status: 404 });
-    if (post.author.toString() !== session.user.id) {
+    if (post.author.toString() !== session.user.id && session.user.role !== 'admin') {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

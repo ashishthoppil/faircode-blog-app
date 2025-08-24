@@ -28,13 +28,33 @@ const authConfig = {
           name: user.name || "",
           email: user.email,
           image: user.image || null,
+          role: user.role || null
         };
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) { if (user?.id) token.id = user.id; return token; },
-    async session({ session, token }) { if (session.user && token?.id) session.user.id = token.id; return session; },
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role || "user";
+      } else if (token?.email && !token?.role) {
+        const client = await clientPromise;
+        const db = client.db(process.env.DB_NAME);
+        const found = await db
+          .collection("users")
+          .findOne({ email: token.email }, { projection: { role: 1 } });
+        token.role = found?.role || "user";
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id;
+        session.user.role = token.role || "user";
+      }
+      return session;
+    },
   },
 };
 

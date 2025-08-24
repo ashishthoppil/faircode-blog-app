@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Logo from '../../Layout/Header/Logo'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 
 const SignUp = ({ setIsSignUpOpen, setIsSignInOpen }) => {  
 

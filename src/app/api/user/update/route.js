@@ -3,15 +3,14 @@ import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { auth } from "@/auth";
 
-export async function POST(req) {
+export async function PATCH(req) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    const { name, email } = await req.json();
-
+    const { name, email, id } = await req.json();
     if (!name && !email) {
       return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
     }
@@ -20,10 +19,11 @@ export async function POST(req) {
     const db = client.db(process.env.DB_NAME);
     const users = db.collection("users");
 
+
     if (email) {
       const existing = await users.findOne({
         email: email,
-        _id: { $ne: new ObjectId(session.user.id) },
+        _id: { $ne: new ObjectId(id ? id : session.user.id) },
       });
       if (existing) {
         return NextResponse.json({ error: "Email already in use" }, { status: 409 });
@@ -31,12 +31,12 @@ export async function POST(req) {
     }
 
     await users.updateOne(
-      { _id: new ObjectId(session.user.id) },
+      { _id: new ObjectId(id ? id : session.user.id) },
       { $set: { ...(name && { name }), ...(email && { email }), updatedAt: new Date() } }
     );
 
     const updatedUser = await users.findOne(
-      { _id: new ObjectId(session.user.id) },
+      { _id: new ObjectId(id ? id : session.user.id) },
       { projection: { passwordHash: 0 } }
     );
 

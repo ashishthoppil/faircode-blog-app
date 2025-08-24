@@ -6,6 +6,7 @@ import Signin from '../../Auth/SignIn'
 import SignUp from '../../Auth/SignUp'
 import { Icon } from '@iconify/react/dist/iconify.js'
 import { useSession, signOut } from 'next-auth/react'
+import Link from 'next/link'
 
 const Header = () => {
 
@@ -79,7 +80,15 @@ const Header = () => {
                 setIsSignInOpen(true)
               }}>
               Sign In
-            </button> : <span className='hidden lg:block'><span className='text-[22px]'>👋</span> Hey {session.user.name.split(' ')[0]}</span>}
+            </button> : <div className='flex gap-2'>
+              <div className='hidden lg:block'><span className='text-[22px]'>👋</span> Hey {session.user.name.split(' ')[0]}</div>
+              <Link
+                href={'/dashboard'}
+                className='hidden lg:block bg-primary duration-300 text-white hover:bg-primary/15 hover:text-primary font-medium text-md py-2 px-6 rounded-lg hover:cursor-pointer'
+              >
+                Dashboard
+              </Link>
+              </div>}
             {isSignInOpen && (
               <div className='fixed top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center z-50'>
                 <div
