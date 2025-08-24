@@ -18,7 +18,7 @@ const Header = () => {
   const signUpRef = useRef(null)
   const mobileMenuRef = useRef(null)
 
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
 
   const handleScroll = () => {

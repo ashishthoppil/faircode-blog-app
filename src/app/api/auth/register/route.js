@@ -28,8 +28,6 @@ export async function POST(req) {
       name: name || null,
       email,
       passwordHash,
-      image: null,
-      emailVerified: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     });

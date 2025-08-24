@@ -2,9 +2,9 @@
 import Link from 'next/link'
 import Logo from '../../Layout/Header/Logo'
 import { useState } from 'react'
-import { signIn } from 'next-auth/react'
+import { signIn, signOut } from 'next-auth/react'
 import { toast } from 'react-toastify'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 
 const Signin = ({ setIsSignInOpen, setIsSignUpOpen }) => {
 
@@ -17,6 +17,7 @@ const Signin = ({ setIsSignInOpen, setIsSignUpOpen }) => {
   const onLogin = async (e) => {
     try {
       e.preventDefault();
+      await signOut({ redirect: false });
       const result = await signIn('credentials', {
         email,
         password,
@@ -33,7 +34,7 @@ const Signin = ({ setIsSignInOpen, setIsSignUpOpen }) => {
       } else {
         setIsSignInOpen(false);
         toast.success('You have logged in!')
-        router.push('/dashboard');
+        // router.push('/dashboard');
       }
     } catch (e) {
       console.error(e)

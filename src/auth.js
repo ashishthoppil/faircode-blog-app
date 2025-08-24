@@ -18,7 +18,7 @@ const authConfig = {
       async authorize(creds) {
         if (!creds?.email || !creds?.password) return null;
         const client = await clientPromise;
-        const db = client.db();
+        const db = client.db(process.env.DB_NAME);
         const user = await db.collection("users").findOne({ email: creds.email });
         if (!user?.passwordHash) return null;
         const ok = await compare(creds.password, user.passwordHash);
