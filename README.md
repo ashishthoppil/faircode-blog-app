@@ -1,6 +1,11 @@
 ## Blog App (Next.js)
 
-Live Demo: 
+# Admin Credentials
+Username: admin@gmail.com
+Password: admin
+
+# Live Demo: 
+[https://faircode-blog-app.vercel.app/](https://faircode-blog-app.vercel.app/)
 
 ## Getting Started
 
