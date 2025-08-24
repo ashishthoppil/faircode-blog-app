@@ -13,8 +13,11 @@ export default function Home() {
     const [navbarOpen, setNavbarOpen] = useState(true)
     const [activeSection, setActiveSection] = useState('profile')
     const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
     const [name, setName] = useState('')
+    const [title, setTitle] = useState('')
+    const [content, setContent] = useState('')
+    const [blogs, setBlogs] = useState([]);
+    const [editingId, setEditingId] = useState(null);
     const [loader, setLoader] = useState(true);
     const sidebarRef = useRef(null)
 
@@ -28,8 +31,29 @@ export default function Home() {
             setName(data.name);
             setEmail(data.email);
         }
+        const loadPosts = async () => {
+            const response = await fetch('/api/posts', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            const data = await response.json();
+            setBlogs(data);
+        }
         loadUser();
+        loadPosts();
     }, [])
+
+    async function reloadPosts() {
+        const res = await fetch('/api/posts');
+        const data = await res.json();
+        if (res.ok) setBlogs(data);
+    }
+
+    const resetBlogForm = () => {
+        setTitle('');
+        setContent('');
+        setEditingId(null);
+    };
 
     const updateHandler = async (e) => {
         e.preventDefault();
@@ -47,7 +71,46 @@ export default function Home() {
         toast.success("Updated Successfully!")
         return data;
     }
-    
+
+    const handleSubmitPost = async (e) => {
+        e.preventDefault();
+        if (!title.trim() || !content.trim()) {
+            toast.error('Title and content are required');
+            return;
+        }
+
+        const url = editingId ? `/api/posts/${editingId}` : '/api/posts';
+        const method = editingId ? 'PATCH' : 'POST';
+
+        const res = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: title.trim(), content: content.trim() }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) return toast.error(data?.error || `Failed to ${editingId ? 'update' : 'create'} post`);
+
+        toast.success(editingId ? 'Post updated!' : 'Post added!');
+        resetBlogForm();
+        await reloadPosts();
+    };
+
+    const handleEdit = (post) => {
+        setEditingId(post._id);
+        setTitle(post.title);
+        setContent(post.content);
+    };
+  
+    const handleDelete = async (id) => {
+        if (!confirm('Delete this post?')) return;
+        const res = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (!res.ok) return toast.error(data?.error || 'Failed to delete');
+        toast.success('Post deleted');
+        if (editingId === id) resetBlogForm();
+        await reloadPosts();
+    };
     
     return (
         <section id='dashboard' className='flex bg-gray-50 h-screen'>
@@ -106,14 +169,14 @@ export default function Home() {
                                     onChange={(e) => setName(e.target.value)}
                                     type='text'
                                     placeholder='Enter your name'
-                                    className='w-full rounded-md border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition border-gray-200 placeholder:text-black/30 focus:border-primary focus-visible:shadow-none text-black'
+                                    className='w-full shadow-md bg-white rounded-md border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition border-gray-200 placeholder:text-black/30 focus:border-primary focus-visible:shadow-none text-black'
                                 />
                                 <input
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     type='email'
                                     placeholder='Enter your email id'
-                                    className='w-full rounded-md border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition border-gray-200 placeholder:text-black/30 focus:border-primary focus-visible:shadow-none text-black'
+                                    className='w-full shadow-md bg-white rounded-md border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition border-gray-200 placeholder:text-black/30 focus:border-primary focus-visible:shadow-none text-black'
                                 />
                             </div>
                             <div className='flex justify-end'>
@@ -139,7 +202,56 @@ export default function Home() {
                         <h2>Posts</h2>
                         <span className='text-xs text-gray-500'>You can view, modify or delete your posts here.</span>
                     </div>
-                    <BlogItem />
+                    <div className='flex gap-10'>
+                        <div className='w-[50%] border-r-2 pr-10'>
+                            <form className='flex flex-col gap-10 w-full'>
+                                <div className='flex flex-col gap-10'>
+                                    <input
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                        type='text'
+                                        placeholder='Enter the post title'
+                                        className='w-full shadow-md bg-white rounded-md border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition border-gray-200 placeholder:text-black/30 focus:border-primary focus-visible:shadow-none text-black'
+                                    />
+                                    <textarea
+                                        value={content}
+                                        onChange={(e) => setContent(e.target.value)}
+                                        type='email'
+                                        placeholder='Enter your posts content'
+                                        className='w-full shadow-md bg-white rounded-md border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition border-gray-200 placeholder:text-black/30 focus:border-primary focus-visible:shadow-none text-black'
+                                    />
+                                </div>
+                                <div className='flex justify-end'>
+                                    <button
+                                        onClick={handleSubmitPost}    
+                                        type='submit'
+                                        className='bg-primary w-[130px] py-3 rounded-lg text-18 font-medium border text-white border-primary hover:text-primary hover:bg-transparent hover:cursor-pointer transition duration-300 ease-in-out'>
+                                        <Icon
+                                            icon='uil:save'
+                                            width={24}
+                                            height={24}
+                                            className='hover:text-primary text-24 inline-block me-2'
+                                        />
+                                        {editingId ? 'Update' : 'Add Post'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        <div className='w-[50%]'>
+                            <h3 className='font-semibold pb-2 border-b-2'>Your Posts</h3>
+                            <div className='h-[28rem] overflow-y-auto'>
+                                {blogs.map((blog) => 
+                                    <BlogItem 
+                                        key={blog._id}
+                                        isDashboard={true}
+                                        blog={blog}
+                                        onEdit={() => handleEdit(blog)}
+                                        onDelete={() => handleDelete(blog._id)}
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 </div>}
         </section>
     );

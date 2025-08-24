@@ -2,8 +2,24 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { BlogItem } from '../BlogItem'
+import { useEffect, useState } from 'react'
 
 const Hero = () => {
+
+  const [blogs, setBlogs] = useState([]);
+
+  useEffect(() => {
+    const loadPosts = async () => {
+      const response = await fetch('/api/posts', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await response.json();
+      setBlogs(data);
+    }
+    loadPosts();
+  }, [])
+
   return (
     <section id='home-section' className='flex items-center bg-gray-50 h-screen'>
       <div className='container xl:pt-7 pt-16'>
@@ -28,9 +44,13 @@ const Hero = () => {
           <div className='lg:col-span-6 flex flex-col items-center justify-start relative pt-[5rem] pl-0 md:py-4 md:pl-10 h-[35rem]'>
             <span className='text-black'>Check out our top blog posts 👇</span>
             <div className='flex flex-col w-full h-[32rem] overflow-y-auto'>
-              
-              <BlogItem />
-
+              {blogs.map((blog) => 
+                <BlogItem 
+                  key={blog._id}
+                  isDashboard={false}
+                  blog={blog}
+                />
+              )}
             </div>
           </div>
           {/* Blogs */}
