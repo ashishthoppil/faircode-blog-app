@@ -181,6 +181,12 @@ const Header = () => {
           <nav className='flex flex-col items-start p-4'>
             {session ? <span className='text-center'><span className='text-[22px]'>👋</span> Hey {session.user.name.split(' ')[0]}</span> : <></>}
             <div className='mt-4 flex flex-col space-y-4 w-full'>
+              {session && <Link
+                href={'/dashboard'}
+                className='text-center bg-primary duration-300 text-white hover:bg-primary/15 hover:text-primary font-medium text-md py-2 px-6 rounded-lg hover:cursor-pointer'
+              >
+                Dashboard
+              </Link>}
               {session ? 
               <button
                   className='bg-primary text-white px-4 py-2 rounded-lg border  border-primary hover:text-primary hover:bg-transparent hover:cursor-pointer transition duration-300 ease-in-out'

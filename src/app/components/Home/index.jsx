@@ -24,8 +24,8 @@ const Hero = () => {
   }, [])
 
   return (
-    <section id='home-section' className='flex items-center bg-gray-50 h-screen'>
-      <div className='container xl:pt-7 pt-16'>
+    <section id='home-section' className='flex items-center bg-gray-50 md:h-screen'>
+      <div className=' md:mt-0 container xl:pt-7 pt-16'>
         <div className='grid grid-cols-1 lg:grid-cols-12 items-center'>
           <div className='lg:col-span-6'>
             <h1 className='font-semibold mb-5 text-black lg:text-start text-center sm:leading-20 leading-16'>

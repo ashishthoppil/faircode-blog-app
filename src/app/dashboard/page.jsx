@@ -188,27 +188,12 @@ export default function Home() {
     };
     
     return (
-            <section id='dashboard' className='flex bg-gray-50 h-screen'>
+            <section id='dashboard' className='flex bg-gray-50 md:h-screen'>
                 <div ref={sidebarRef}
                     className={` h-[] w-[100px] bg-white shadow-lg transform transition-transform duration-300 max-w-xs ${
                         navbarOpen ? 'translate-x-0' : 'translate-x-0'
                     } z-50`}
                 >
-                    <div className='flex items-center justify-between gap-2 p-4'>
-                        {/* <Logo /> */}
-                        <button
-                            onClick={() => setNavbarOpen(false)}
-                            className="md:hidden bg-white relative right-0"
-                            aria-label='Close menu Modal'
-                        >
-                            <Icon
-                                icon='icon-park-solid:left-c'
-                                width={24}
-                                height={24}
-                                className='text-black hover:text-primary text-24 inline-block me-2'
-                            />
-                        </button>
-                    </div>
                     <nav className='flex flex-col items-start py-4'>
                         <div className='mt-4 flex flex-col space-y-4 w-full'>
                             <button onClick={() => setActiveSection('profile')} className={`${activeSection === 'profile' ? 'bg-primary text-white hover:bg-primary/75' : ''} text-primary hover:bg-gray-200 w-full py-5 font-semibold hover:cursor-pointer`}>
@@ -243,7 +228,7 @@ export default function Home() {
                             <span className='text-xs text-gray-500'>You can modify your name, password and email from here.</span>
                         </div>
                         <form className='flex flex-col gap-10 w-full'>
-                            <div className='flex gap-10'>
+                            <div className='flex flex-col md:flex-row gap-10'>
                                 <input
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
@@ -282,8 +267,8 @@ export default function Home() {
                         <h2>Users</h2>
                         <span className='text-xs text-gray-500'>You can create, view, edit or delete users here.</span>
                     </div>
-                    <div className='flex gap-10'>
-                        <div className='w-[50%] border-r-2 pr-10'>
+                    <div className='flex flex-col md:flex-row gap-10'>
+                        <div className='w-full md:w-[50%] md:border-r-2 md:pr-10'>
                             <form className='flex flex-col gap-10 w-full'>
                                 <div className='flex flex-col gap-10'>
                                     <input
@@ -325,9 +310,39 @@ export default function Home() {
                                 </div>
                             </form>
                         </div>
-                        <div className='w-[50%]'>
+                        <div className='w-full md:w-[50%]'>
                             <h3 className='font-semibold pb-2 border-b-2'>Users List</h3>
-                            <div className='h-[28rem] overflow-y-auto'>
+                            {/* Mobile (cards) */}
+                            <ul className="flex flex-col gap-5 md:hidden divide-y rounded-lg border bg-white mt-5">
+                                {users.map((user) => (
+                                    <li key={user._id} className="p-4 flex items-start gap-3">
+                                    <Image src="/user.png" height={36} width={36} alt="User" className="rounded-full" />
+                                    <div className="flex-1 min-w-0">
+                                        <div className="font-medium">{user.name}</div>
+                                        <div className="text-sm text-gray-500 truncate">{user.email}</div>
+                                        <div className="mt-3 flex gap-2">
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); onUserEdit(user); }}
+                                            className="flex items-center gap-1 text-blue-600 hover:bg-blue-600 hover:text-white transition text-xs border border-blue-600 px-2 py-1 rounded-md"
+                                        >
+                                            <Icon icon="mdi:pencil" width={12} height={12} />
+                                            Edit
+                                        </button>
+                                        {user._id !== session.user.id && (
+                                            <button
+                                            onClick={(e) => { e.stopPropagation(); onUserDelete(user._id); }}
+                                            className="flex items-center gap-1 text-red-500 hover:bg-red-500 hover:text-white transition text-xs border border-red-500 px-2 py-1 rounded-md"
+                                            >
+                                            <Icon icon="streamline:delete-1" width={10} height={10} />
+                                            Delete
+                                            </button>
+                                        )}
+                                        </div>
+                                    </div>
+                                    </li>
+                                ))}
+                            </ul>
+                            <div className='hidden md:block h-[28rem] overflow-y-auto'>
                                 <table className='w-full mt-5'>
                                     <thead>
                                         <tr>
@@ -384,8 +399,8 @@ export default function Home() {
                         <h2>Posts</h2>
                         <span className='text-xs text-gray-500'>You can view, modify or delete your posts here.</span>
                     </div>
-                    <div className='flex gap-10'>
-                        <div className='w-[50%] border-r-2 pr-10'>
+                    <div className='flex flex-col md:flex-row gap-10'>
+                        <div className='w-full md:w-[50%] md:border-r-2 md:pr-10'>
                             <form className='flex flex-col gap-10 w-full'>
                                 <div className='flex flex-col gap-10'>
                                     <input
@@ -418,15 +433,15 @@ export default function Home() {
                                 </div>
                             </form>
                         </div>
-                        <div className='w-[50%]'>
-                            <div className='flex items-end justify-between pb-2 border-b-2'>
+                        <div className='w-full md:w-[50%]'>
+                            <div className='flex flex-col md:flex-row md:items-end justify-between pb-2 border-b-2'>
                                 <h3 className='font-semibold'>{role === 'admin' ? 'Posts' : 'Your Posts'}</h3>
                                 {role === 'admin' && <input
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     type='text'
                                     placeholder='Search by Author or Post Title'
-                                    className='w-[400px] shadow-md bg-white rounded-md border border-solid bg-transparent px-5 py-1 text-base text-dark outline-hidden transition border-gray-200 placeholder:text-black/30 focus:border-primary focus-visible:shadow-none text-black'
+                                    className='w-full mt-5 md:mt-0 md:w-[400px] shadow-md bg-white rounded-md border border-solid bg-transparent px-5 py-1 text-base text-dark outline-hidden transition border-gray-200 placeholder:text-black/30 focus:border-primary focus-visible:shadow-none text-black'
                                 />}
                             </div>
                             

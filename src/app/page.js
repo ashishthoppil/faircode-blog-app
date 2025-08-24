@@ -3,7 +3,7 @@ import { ToastContainer } from 'react-toastify';
 
 export default function Home() {
   return (
-    <main className="h-screen">
+    <main className="flex-1">
       <Hero />
       <ToastContainer />
     </main>

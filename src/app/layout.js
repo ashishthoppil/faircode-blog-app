@@ -18,7 +18,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${font.className}`}>
+      <body className={`min-h-screen flex flex-col ${font.className}`}>
         <SessionProvider>
           <Header />
           {children}
